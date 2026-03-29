@@ -1,0 +1,21 @@
+# Project data and generated outputs
+data/
+documents/
+results/
+results_novel/
+
+# Local environments
+environment/
+venv/
+sc_proj_env/
+
+# Python cache and artifacts
+__pycache__/
+*.pyc
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# OS / local files
+.DS_Store
+.env
