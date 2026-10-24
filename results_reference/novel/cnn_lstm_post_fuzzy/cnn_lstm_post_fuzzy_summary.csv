@@ -1,0 +1,2 @@
+experiment,accuracy,precision_weighted,recall_weighted,f1_weighted
+cnn_lstm_post_fuzzy,0.9812206572769953,0.981911396685381,0.9812206572769953,0.9812142270028971

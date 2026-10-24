@@ -1,0 +1,6 @@
+name,accuracy
+lstm_baseline,0.334507042
+lstm_embedded,0.4342723
+cnn_baseline,0.98943662
+cnn_embedded,0.985915493
+hybrid_cnn_lstm,0.992957746

@@ -25,23 +25,22 @@ Two independent training scripts are provided:
 ## Project Structure
 ```text
 Soft_Computing_Project/
-|-- main.py
-|-- main2.py
-|-- test.py
-|-- test2.py
+|-- main.py                  # baseline training pipeline
+|-- main2.py                 # novel (rough-set + fuzzy) pipeline
 |-- requirements.txt
-|-- data/
-|   `-- feature_time_48k_2048_load_1.csv
-|-- results/
-|   `-- results_summary.csv
-`-- results_novel/
-    |-- all_features_preview.csv
-    |-- roughset_cnn_lstm/
-    |-- hybrid_cnn_lstm_fuzzy/
-    |-- cnn_lstm_post_fuzzy/
-    |-- confidence_fuzzy/
-    `-- gradcam_fuzzy/
+|-- scripts/
+|   |-- check_gpu.py         # prints TensorFlow version and detected GPUs
+|   `-- inspect_mat_files.py # lists keys of every data/raw/*.mat file
+|-- data/                    # local only (git-ignored)
+|   `-- raw/                 # CWRU .mat vibration files
+|-- results_reference/       # tracked: lightweight reference results
+|   |-- baseline/            # results_summary.csv + confusion matrices
+|   `-- novel/<experiment>/  # <experiment>_summary.csv + confusion matrix
+|-- results/                 # local training output of main.py (git-ignored)
+`-- results_novel/           # local training output of main2.py (git-ignored)
 ```
+
+Model files (`*.h5`), pickles (`*.pkl`), `*.npz` archives, `data/` and course documents are kept local and are not tracked.
 
 ## Methodology
 ### 1) Data preprocessing
@@ -122,17 +121,26 @@ python main.py
 
 Optional arguments:
 ```bash
-python main.py --data-dir ./data/CWRU --result-dir ./results --epochs 10
+python main.py --data-dir ./data/raw --result-dir ./results --epochs 10
 ```
+
+Note: the built-in default for `--data-dir` is `./data/CWRU`, so pass `--data-dir ./data/raw` explicitly.
 
 ### 3) Run novel pipeline (`main2.py`)
 `main2.py` requires explicit input and output paths:
 ```bash
-python main2.py --data-dir ./data/CWRU --result-dir ./results_novel --epochs 10
+python main2.py --data-dir ./data/raw --result-dir ./results_novel --epochs 10
+```
+
+### 4) Helper scripts
+```bash
+python scripts/check_gpu.py          # TensorFlow version / GPU detection
+python scripts/inspect_mat_files.py  # list keys in data/raw/*.mat
 ```
 
 ## Data expectation
-- Input should be `.mat` vibration files under the specified `--data-dir` (recursive search).
+- Input should be `.mat` vibration files under the specified `--data-dir` (recursive search). The expected location is `data/raw/` (10 CWRU files: Normal, plus Ball/Inner/Outer faults at 0.007, 0.014 and 0.021 in.).
+- `data/` is not tracked; place the files there locally.
 
 ## Results and Outputs
 ### Baseline (`results/`)
@@ -150,9 +158,23 @@ python main2.py --data-dir ./data/CWRU --result-dir ./results_novel --epochs 10
 - `<experiment>_accuracy_loss.png`
 - `<experiment>_model.h5`
 
-### Existing recorded metrics (from current repository outputs)
-- Baseline best shown in `results/results_summary.csv`: `hybrid_cnn_lstm` accuracy ~ `0.993`.
-- Novel best shown in `results_novel/*_summary.csv`: `hybrid_cnn_lstm_fuzzy` accuracy ~ `0.9965`.
+### Reference metrics
+Lightweight reference outputs (summary CSVs and confusion matrices) are tracked in `results_reference/`.
+
+| Pipeline | Model | Accuracy |
+|---|---|---|
+| Baseline (`main.py`) | `lstm_baseline` | 33.45% |
+| Baseline (`main.py`) | `lstm_embedded` | 43.43% |
+| Baseline (`main.py`) | `cnn_baseline` | 98.94% |
+| Baseline (`main.py`) | `cnn_embedded` | 98.59% |
+| Baseline (`main.py`) | `hybrid_cnn_lstm` (best) | **99.30%** |
+| Novel (`main2.py`) | `cnn_lstm_post_fuzzy` | 98.12% |
+| Novel (`main2.py`) | `gradcam_fuzzy` | 98.47% |
+| Novel (`main2.py`) | `confidence_fuzzy` | 99.18% |
+| Novel (`main2.py`) | `roughset_cnn_lstm` | 99.41% |
+| Novel (`main2.py`) | `hybrid_cnn_lstm_fuzzy` (best) | **99.65%** |
+
+Best baseline ~99.30% vs best novel ~99.65%.
 
 ## Tech Stack
 - Python

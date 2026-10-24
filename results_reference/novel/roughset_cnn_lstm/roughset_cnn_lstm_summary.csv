@@ -1,0 +1,2 @@
+experiment,accuracy,precision_weighted,recall_weighted,f1_weighted
+roughset_cnn_lstm,0.994131455399061,0.994135544674024,0.994131455399061,0.994131455399061

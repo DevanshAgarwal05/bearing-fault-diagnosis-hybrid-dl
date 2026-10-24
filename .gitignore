@@ -1,21 +1,40 @@
 # Project data and generated outputs
 data/
-documents/
 results/
 results_novel/
+
+# Course documents (local only)
+Documents/
+documents/
+
+# Large binaries / model artifacts (reference results are whitelisted below)
+*.npz
+*.h5
+*.pkl
 
 # Local environments
 environment/
 venv/
+.venv/
 sc_proj_env/
 
 # Python cache and artifacts
 __pycache__/
 *.pyc
+*.egg-info/
+.pytest_cache/
 
 # Notebook checkpoints
 .ipynb_checkpoints/
 
+# IDE folders
+.idea/
+.vscode/
+
 # OS / local files
 .DS_Store
 .env
+
+# Lightweight reference results (summary CSVs and confusion matrices only)
+!results_reference/
+!results_reference/**

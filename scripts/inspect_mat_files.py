@@ -1,7 +1,8 @@
 import glob, os
 import scipy.io as sio
 
-files = glob.glob(r"C:\Users\devan\OneDrive\Desktop\SEM V\Soft_Computing_Project\data\raw\*.mat")
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+files = sorted(glob.glob(os.path.join(ROOT, "data", "raw", "*.mat")))
 print("Found .mat files:", files)
 
 for f in files:
