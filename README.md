@@ -4,8 +4,8 @@
 This project implements a vibration-signal fault diagnosis workflow for rotating machinery (CWRU-style `.mat` datasets). It combines signal processing, deep learning, and soft-computing techniques to classify fault conditions such as `Normal`, `Inner`, `Outer`, and `Ball`.
 
 Two independent training scripts are provided:
-- `main.py`: baseline/standard implementation with CNN, LSTM, hybrid CNN-LSTM, and an autoencoder.
-- `main2.py`: novel implementation that extends the baseline idea with rough-set-inspired feature selection, fuzzy feature enhancement, and multiple hybrid evaluation variants.
+- `baseline_pipeline.py`: baseline/standard implementation with CNN, LSTM, hybrid CNN-LSTM, and an autoencoder.
+- `novel_fuzzy_pipeline.py`: novel implementation that extends the baseline idea with rough-set-inspired feature selection, fuzzy feature enhancement, and multiple hybrid evaluation variants.
 
 ## Features
 - Robust recursive loading of `.mat` vibration files and automatic 1D signal extraction.
@@ -14,19 +14,20 @@ Two independent training scripts are provided:
 - Sequence modeling with LSTM on raw windowed signals.
 - Hybrid CNN-LSTM architecture for fused spectral + temporal learning.
 - Fuzzy logic integration:
-  - Embedded fuzzy membership layer (`main.py`).
-  - Fuzzy-enhanced engineered features and post-fuzzy prediction adjustment (`main2.py`).
+  - Embedded fuzzy membership layer (`baseline_pipeline.py`).
+  - Fuzzy-enhanced engineered features and post-fuzzy prediction adjustment (`novel_fuzzy_pipeline.py`).
 - Automatic evaluation artifacts:
   - Accuracy/weighted metrics CSVs.
   - Confusion matrix plots.
-  - Training curves (in `main2.py`).
+  - Training curves (in `novel_fuzzy_pipeline.py`).
   - Saved model files.
 
 ## Project Structure
 ```text
 Soft_Computing_Project/
-|-- main.py                  # baseline training pipeline
-|-- main2.py                 # novel (rough-set + fuzzy) pipeline
+|-- src/
+|   |-- baseline_pipeline.py     # baseline training pipeline
+|   `-- novel_fuzzy_pipeline.py  # novel (rough-set + fuzzy) pipeline
 |-- requirements.txt
 |-- scripts/
 |   |-- check_gpu.py         # prints TensorFlow version and detected GPUs
@@ -36,8 +37,8 @@ Soft_Computing_Project/
 |-- results_reference/       # tracked: lightweight reference results
 |   |-- baseline/            # results_summary.csv + confusion matrices
 |   `-- novel/<experiment>/  # <experiment>_summary.csv + confusion matrix
-|-- results/                 # local training output of main.py (git-ignored)
-`-- results_novel/           # local training output of main2.py (git-ignored)
+|-- results/                 # local training output of baseline_pipeline.py (git-ignored)
+`-- results_novel/           # local training output of novel_fuzzy_pipeline.py (git-ignored)
 ```
 
 Model files (`*.h5`), pickles (`*.pkl`), `*.npz` archives, `data/` and course documents are kept local and are not tracked.
@@ -53,7 +54,7 @@ Model files (`*.h5`), pickles (`*.pkl`), `*.npz` archives, `data/` and course do
 ### 2) Representation building
 - **Sequence representation**: normalized raw windows for LSTM.
 - **Spectral representation**: log-scaled spectrograms for CNN/hybrid models.
-- **Engineered features (`main2.py`)**:
+- **Engineered features (`novel_fuzzy_pipeline.py`)**:
   - Time-domain: mean, std, RMS, peak-to-peak, skewness, kurtosis, crest factor.
   - Frequency-domain (Welch PSD): centroid, bandwidth, entropy, rolloff.
 
@@ -64,7 +65,7 @@ Model files (`*.h5`), pickles (`*.pkl`), `*.npz` archives, `data/` and course do
 - Summary CSV generation for experiment comparison.
 
 ## Training Scripts
-### `main.py` (baseline / standard)
+### `baseline_pipeline.py` (baseline / standard)
 Purpose:
 - Establishes baseline deep models and fuzzy-augmented variants on the same segmented dataset.
 
@@ -84,7 +85,7 @@ Notes:
 - CPU-only mode is enforced (`CUDA_VISIBLE_DEVICES=-1`).
 - Includes a defined post-fuzzy rule system helper, while model comparison primarily uses embedded fuzzy membership for LSTM/CNN variants.
 
-### `main2.py` (novel implementation)
+### `novel_fuzzy_pipeline.py` (novel implementation)
 Purpose:
 - Implements a broader experimental framework combining rough-set-style feature relevance and fuzzy-enhanced hybrid modeling.
 
@@ -114,22 +115,22 @@ Important implementation detail:
 pip install -r requirements.txt
 ```
 
-### 2) Run baseline training (`main.py`)
+### 2) Run baseline training (`baseline_pipeline.py`)
 ```bash
-python main.py
+python src/baseline_pipeline.py
 ```
 
 Optional arguments:
 ```bash
-python main.py --data-dir ./data/raw --result-dir ./results --epochs 10
+python src/baseline_pipeline.py --data-dir ./data/raw --result-dir ./results --epochs 10
 ```
 
 Note: the built-in default for `--data-dir` is `./data/CWRU`, so pass `--data-dir ./data/raw` explicitly.
 
-### 3) Run novel pipeline (`main2.py`)
-`main2.py` requires explicit input and output paths:
+### 3) Run novel pipeline (`novel_fuzzy_pipeline.py`)
+`novel_fuzzy_pipeline.py` requires explicit input and output paths:
 ```bash
-python main2.py --data-dir ./data/raw --result-dir ./results_novel --epochs 10
+python src/novel_fuzzy_pipeline.py --data-dir ./data/raw --result-dir ./results_novel --epochs 10
 ```
 
 ### 4) Helper scripts
@@ -163,16 +164,16 @@ Lightweight reference outputs (summary CSVs and confusion matrices) are tracked 
 
 | Pipeline | Model | Accuracy |
 |---|---|---|
-| Baseline (`main.py`) | `lstm_baseline` | 33.45% |
-| Baseline (`main.py`) | `lstm_embedded` | 43.43% |
-| Baseline (`main.py`) | `cnn_baseline` | 98.94% |
-| Baseline (`main.py`) | `cnn_embedded` | 98.59% |
-| Baseline (`main.py`) | `hybrid_cnn_lstm` (best) | **99.30%** |
-| Novel (`main2.py`) | `cnn_lstm_post_fuzzy` | 98.12% |
-| Novel (`main2.py`) | `gradcam_fuzzy` | 98.47% |
-| Novel (`main2.py`) | `confidence_fuzzy` | 99.18% |
-| Novel (`main2.py`) | `roughset_cnn_lstm` | 99.41% |
-| Novel (`main2.py`) | `hybrid_cnn_lstm_fuzzy` (best) | **99.65%** |
+| Baseline (`baseline_pipeline.py`) | `lstm_baseline` | 33.45% |
+| Baseline (`baseline_pipeline.py`) | `lstm_embedded` | 43.43% |
+| Baseline (`baseline_pipeline.py`) | `cnn_baseline` | 98.94% |
+| Baseline (`baseline_pipeline.py`) | `cnn_embedded` | 98.59% |
+| Baseline (`baseline_pipeline.py`) | `hybrid_cnn_lstm` (best) | **99.30%** |
+| Novel (`novel_fuzzy_pipeline.py`) | `cnn_lstm_post_fuzzy` | 98.12% |
+| Novel (`novel_fuzzy_pipeline.py`) | `gradcam_fuzzy` | 98.47% |
+| Novel (`novel_fuzzy_pipeline.py`) | `confidence_fuzzy` | 99.18% |
+| Novel (`novel_fuzzy_pipeline.py`) | `roughset_cnn_lstm` | 99.41% |
+| Novel (`novel_fuzzy_pipeline.py`) | `hybrid_cnn_lstm_fuzzy` (best) | **99.65%** |
 
 Best baseline ~99.30% vs best novel ~99.65%.
 
